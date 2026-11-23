@@ -1,0 +1,21 @@
+{
+    "ListenAddress": ":8066",
+    "ThrottlePerSec": 300,
+    "ThrottleMemoryStoreSize": 50000,
+    "ThrottleVaryByHeader": "X-Forwarded-For",
+    "EnableMetrics": false,
+    "SendTimeoutSec": 30,
+    "RetryTimeoutSec": 8,
+    "ApplePushSettings": [],
+    "AndroidPushSettings": [
+        {
+            "Type": "android_rn",
+            "ServiceFileLocation": "/mattermost-push-proxy/config/firebase-service-account.json"
+        }
+    ],
+    "EnableConsoleLog": true,
+    "EnableFileLog": false,
+    "LogFileLocation": "",
+    "LogFormat": "plain",
+    "LogLevel": "info"
+}

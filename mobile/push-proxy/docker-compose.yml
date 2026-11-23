@@ -1,0 +1,8 @@
+services:
+  push-proxy:
+    image: mattermost/mattermost-push-proxy:6.6.0
+    restart: unless-stopped
+    ports:
+      - "8066:8066"
+    volumes:
+      - ./config:/mattermost-push-proxy/config:ro

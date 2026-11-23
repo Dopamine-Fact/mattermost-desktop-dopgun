@@ -1,0 +1,15 @@
+{
+  "appId": "com.dopaminefact.app",
+  "appName": "Dopamine Fact",
+  "webDir": "www",
+  "server": {
+    "url": "https://todo.dopaminefact.com",
+    "cleartext": false
+  },
+  "android": {
+    "backgroundColor": "#000000"
+  },
+  "ios": {
+    "backgroundColor": "#000000"
+  }
+}

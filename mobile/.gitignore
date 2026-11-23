@@ -1,0 +1,5 @@
+# Firebase service account key: secret, never commit
+push-proxy/config/firebase-service-account.json
+# APNs auth key: secret, never commit
+*.p8
+android/app/google-services.json
