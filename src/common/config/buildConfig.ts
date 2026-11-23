@@ -4,8 +4,6 @@
 
 import type {BuildConfig} from 'types/config';
 
-import {DEFAULT_ACADEMY_LINK, DEFAULT_HELP_LINK, DEFAULT_UPGRADE_LINK} from '../../common/constants';
-
 // For detailed guides, please refer to https://docs.mattermost.com/deployment/desktop-app-deployment.html
 
 /**
@@ -24,17 +22,17 @@ import {DEFAULT_ACADEMY_LINK, DEFAULT_HELP_LINK, DEFAULT_UPGRADE_LINK} from '../
  * @prop {[]} trustedEmbeddedMediaOrigins - Explicit origin pairs that may share media permissions for embedded content
  */
 const buildConfig: BuildConfig = {
-    defaultServers: [/*
-    {
-      name: 'example',
-      url: 'https://example.com'
-    }
-  */],
-    helpLink: DEFAULT_HELP_LINK,
-    academyLink: DEFAULT_ACADEMY_LINK,
-    upgradeLink: DEFAULT_UPGRADE_LINK,
-    enableServerManagement: true,
-    enableUpdateNotifications: true,
+    defaultServers: [
+        {
+            name: 'Dopamine Fact',
+            url: 'https://todo.dopaminefact.com',
+        },
+    ],
+    helpLink: '',
+    academyLink: '',
+    upgradeLink: '',
+    enableServerManagement: false,
+    enableUpdateNotifications: false, // would offer official Mattermost releases
     updateNotificationURL: 'https://releases.mattermost.com/desktop',
     macAppStoreUpdateURL: 'macappstore://apps.apple.com/us/app/mattermost-desktop/id1614666244',
     windowsStoreUpdateURL: 'ms-windows-store://pdp/?productid=XP8BR8MH3LPKLT',

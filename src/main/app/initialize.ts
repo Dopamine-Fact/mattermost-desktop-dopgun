@@ -5,7 +5,7 @@ import path from 'path';
 import {pathToFileURL} from 'url';
 
 import type {IpcMainInvokeEvent} from 'electron';
-import {app, BrowserWindow, ipcMain, nativeTheme, net, protocol, session} from 'electron';
+import {app, BrowserWindow, ipcMain, nativeTheme, net, powerMonitor, protocol, session} from 'electron';
 import installExtension, {REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS} from 'electron-devtools-installer';
 import isDev from 'electron-is-dev';
 import Joi from 'joi';
@@ -28,6 +28,8 @@ import {
     UPDATE_CONFIGURATION,
     UPDATE_PATHS,
     GET_DARK_MODE,
+    GET_APP_USAGE,
+    SERVER_LOGGED_IN_CHANGED,
     DOUBLE_CLICK_ON_WINDOW,
     TOGGLE_SECURE_INPUT,
     GET_APP_INFO,
@@ -43,6 +45,8 @@ import {Logger} from 'common/log';
 import ServerManager from 'common/servers/serverManager';
 import {parseURL} from 'common/utils/url';
 import {ipcValidate} from 'common/Validator';
+import {AppUsageTracker} from 'main/appUsage/appUsageTracker';
+import {getForegroundWindow} from 'main/appUsage/foregroundWindow';
 import AppVersionManager from 'main/AppVersionManager';
 import AutoLauncher from 'main/AutoLauncher';
 import {configPath, updatePaths} from 'main/constants';
@@ -107,6 +111,8 @@ import {
 } from './windows';
 
 const log = new Logger('App.Initialize');
+
+let appUsageTracker: AppUsageTracker | undefined;
 
 /**
  * Main entry point for the application, ensures that everything initializes in the proper order
@@ -271,6 +277,10 @@ function initializeInterCommunicationEventListeners() {
     ipcMain.on(UPDATE_CONFIGURATION, updateConfiguration);
 
     ipcMain.handle(GET_DARK_MODE, handleGetDarkMode);
+    ipcMain.handle(GET_APP_USAGE, (event: IpcMainInvokeEvent) => {
+        const view = WebContentsManager.getViewByWebContentsId(event.sender.id);
+        return view && appUsageTracker ? appUsageTracker.drain(view.serverId) : [];
+    });
     ipcMain.on(DOUBLE_CLICK_ON_WINDOW, handleDoubleClick);
     DeveloperMode.on(DEVELOPER_MODE_UPDATED, handleDeveloperModeUpdated);
 
@@ -331,7 +341,7 @@ async function initializeAfterAppReady() {
     ServerManager.init();
     ServerManager.off(SERVER_ADDED, PreAuthManager.loadPreAuthSecretForServer);
 
-    app.setAppUserModelId('Mattermost.Desktop'); // Use explicit AppUserModelID
+    app.setAppUserModelId('DopamineFact.Desktop'); // Use explicit AppUserModelID
     const defaultSession = session.defaultSession;
     defaultSession.webRequest.onBeforeRequest(async (details, callback) => {
         try {
@@ -468,6 +478,23 @@ async function initializeAfterAppReady() {
                 NavigationManager.openLinkInPrimaryTab(deeplinkingURL);
             }
         }
+    }
+
+    if (process.platform === 'win32') {
+        appUsageTracker = new AppUsageTracker({
+            now: Date.now,
+            idleSeconds: () => powerMonitor.getSystemIdleTime(),
+            sample: getForegroundWindow,
+            serverIds: () => ServerManager.getAllServers().filter((server) => server.isLoggedIn).map((server) => server.id),
+        });
+        appUsageTracker.start();
+
+        // Time recorded for a session that has ended must not reach whoever logs in next.
+        ServerManager.on(SERVER_LOGGED_IN_CHANGED, (serverId: string, loggedIn: boolean) => {
+            if (!loggedIn) {
+                appUsageTracker?.drain(serverId);
+            }
+        });
     }
 
     // Call this to initiate a permissions check for DND state

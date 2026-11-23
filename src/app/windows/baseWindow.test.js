@@ -197,31 +197,16 @@ describe('BaseWindow', () => {
             Object.defineProperty(process, 'platform', {value: originalPlatform});
         });
 
-        it('should set title bar overlay with light theme colors', () => {
-            Config.darkMode = false;
+        it.each([false, true])('should set the same light-on-black title bar overlay (darkMode=%s)', (darkMode) => {
+            Config.darkMode = darkMode;
 
             const baseWindow = new BaseWindow({});
 
             expect(baseWindow).toBeDefined();
             expect(BrowserWindow).toHaveBeenCalledWith(expect.objectContaining({
                 titleBarOverlay: {
-                    color: 'rgba(255, 255, 255, 0)',
-                    symbolColor: 'rgba(63, 67, 80, 0.64)',
-                    height: TAB_BAR_HEIGHT,
-                },
-            }));
-        });
-
-        it('should set title bar overlay with dark theme colors', () => {
-            Config.darkMode = true;
-
-            const baseWindow = new BaseWindow({});
-
-            expect(baseWindow).toBeDefined();
-            expect(BrowserWindow).toHaveBeenCalledWith(expect.objectContaining({
-                titleBarOverlay: {
-                    color: 'rgba(25, 27, 31, 0)',
-                    symbolColor: 'rgba(227, 228, 232, 0.64)',
+                    color: 'rgba(0, 0, 0, 0)',
+                    symbolColor: 'rgba(242, 242, 242, 0.64)',
                     height: TAB_BAR_HEIGHT,
                 },
             }));

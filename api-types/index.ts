@@ -87,6 +87,7 @@ export type DesktopAPI = {
 
     updateTheme: (theme: Theme) => void;
     getDarkMode: () => Promise<boolean>;
+    getAppUsage: () => Promise<Array<{app: string; title: string; start_at: number; end_at: number}>>;
     onDarkModeChanged: (listener: (darkMode: boolean) => void) => () => void;
 
     // Calls

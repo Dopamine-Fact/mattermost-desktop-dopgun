@@ -18,6 +18,7 @@ export const EMIT_CONFIGURATION = 'emit-configuration';
 
 export const DARK_MODE_CHANGE = 'dark-mode-change';
 export const GET_DARK_MODE = 'get-dark-mode';
+export const GET_APP_USAGE = 'get-app-usage';
 export const USER_ACTIVITY_UPDATE = 'user-activity-update';
 export const UPDATE_SHORTCUT_MENU = 'update-shortcut-menu';
 

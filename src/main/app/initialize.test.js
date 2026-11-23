@@ -6,7 +6,10 @@ import path from 'path';
 import {app, session} from 'electron';
 
 import NavigationManager from 'app/navigationManager';
+import {SERVER_LOGGED_IN_CHANGED} from 'common/communication';
 import Config from 'common/config';
+import ServerManager from 'common/servers/serverManager';
+import {AppUsageTracker} from 'main/appUsage/appUsageTracker';
 import parseArgs from 'main/ParseArgs';
 import LocalNetworkAccessManager from 'main/security/localNetworkAccess';
 
@@ -160,6 +163,8 @@ jest.mock('common/appState', () => ({
     on: jest.fn(),
 }));
 jest.mock('main/AppVersionManager', () => ({}));
+jest.mock('main/appUsage/appUsageTracker', () => ({AppUsageTracker: jest.fn()}));
+jest.mock('main/appUsage/foregroundWindow', () => ({getForegroundWindow: jest.fn()}));
 jest.mock('main/AutoLauncher', () => ({
     upgradeAutoLaunch: jest.fn(),
 }));
@@ -271,6 +276,7 @@ describe('main/app/initialize', () => {
     });
     beforeEach(() => {
         parseArgs.mockReturnValue({});
+        AppUsageTracker.mockImplementation(() => ({start: jest.fn(), drain: jest.fn()}));
         Config.once.mockImplementation((event, cb) => {
             if (event === 'update') {
                 cb();
@@ -361,6 +367,24 @@ describe('main/app/initialize', () => {
             });
 
             expect(NavigationManager.openLinkInPrimaryTab).toHaveBeenCalledWith('mattermost://server-1.com');
+        });
+
+        it('tracks app usage on win32 only for logged-in servers and drops the queue of a server on logout', async () => {
+            const tracker = {start: jest.fn(), drain: jest.fn()};
+            AppUsageTracker.mockImplementation((deps) => Object.assign(tracker, {deps}));
+            const originalPlatform = process.platform;
+            Object.defineProperty(process, 'platform', {value: 'win32'});
+            await initialize();
+            Object.defineProperty(process, 'platform', {value: originalPlatform});
+
+            expect(tracker.start).toHaveBeenCalled();
+            ServerManager.getAllServers.mockReturnValue([{id: 'a', isLoggedIn: true}, {id: 'b', isLoggedIn: false}]);
+            expect(tracker.deps.serverIds()).toEqual(['a']);
+            const onLoggedInChanged = ServerManager.on.mock.calls.find(([event]) => event === SERVER_LOGGED_IN_CHANGED)[1];
+            onLoggedInChanged('a', true);
+            expect(tracker.drain).not.toHaveBeenCalled();
+            onLoggedInChanged('a', false);
+            expect(tracker.drain).toHaveBeenCalledWith('a');
         });
 
         describe('local network request filter (onBeforeRequest)', () => {

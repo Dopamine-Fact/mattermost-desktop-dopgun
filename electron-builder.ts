@@ -19,7 +19,7 @@ function getMacVersions() {
 }
 
 const config = {
-    appId: 'Mattermost.Desktop',
+    appId: 'DopamineFact.Desktop',
     artifactName: '${version}/${name}-${version}-${os}-${arch}.${ext}',
     directories: {
         buildResources: 'src/assets',
@@ -59,7 +59,7 @@ const config = {
     ],
     protocols: [
         {
-            name: 'Mattermost',
+            name: 'Dopamine Fact',
             schemes: [
                 'mattermost',
             ],
@@ -69,7 +69,7 @@ const config = {
     afterPack: 'scripts/afterpack.js',
     deb: {
         artifactName: '${version}/${name}_${version}-1_${arch}.${ext}',
-        synopsis: 'Mattermost Desktop App',
+        synopsis: 'Dopamine Fact Desktop App',
         depends: [
             'libnotify4',
             'libxtst6',
@@ -207,6 +207,9 @@ const config = {
             endpoint: 'https://eus.codesigning.azure.net',
             publisherName: 'CN="Mattermost, Inc.", O="Mattermost, Inc.", L=Palo Alto, S=California, C=US',
         } : null,
+    },
+    nsis: {
+        artifactName: '${version}/DopamineFact-Setup-${version}-${arch}.${ext}',
     },
     msi: {
         additionalWixArgs: ['-ext', 'WixUtilExtension'],

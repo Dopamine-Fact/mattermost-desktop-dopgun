@@ -5,7 +5,6 @@ import {shell, app, clipboard, type MenuItemConstructorOptions} from 'electron';
 import {transports} from 'electron-log';
 
 import Config from 'common/config';
-import {DEFAULT_EE_REPORT_PROBLEM_LINK, DEFAULT_TE_REPORT_PROBLEM_LINK} from 'common/constants';
 import {Logger} from 'common/log';
 import ServerManager from 'common/servers/serverManager';
 import {isHttpLink} from 'common/utils/url';
@@ -71,18 +70,8 @@ export default function createHelpMenu(): MenuItemConstructorOptions {
         },
     });
 
-    let reportProblemLink = currentRemoteInfo?.reportProblemLink;
-    if (!reportProblemLink) {
-        switch (currentRemoteInfo?.licenseSku) {
-        case 'enterprise':
-        case 'professional':
-            reportProblemLink = DEFAULT_EE_REPORT_PROBLEM_LINK;
-            break;
-        default:
-            reportProblemLink = DEFAULT_TE_REPORT_PROBLEM_LINK;
-            break;
-        }
-    }
+    // Only the server's own link; no fallback to Mattermost support
+    const reportProblemLink = currentRemoteInfo?.reportProblemLink;
     if (isHttpLink(reportProblemLink)) {
         submenu.push({
             label: localizeMessage('main.menus.app.help.reportProblem', 'Report a problem'),

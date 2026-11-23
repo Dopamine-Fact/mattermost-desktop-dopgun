@@ -250,7 +250,8 @@ export class Config extends EventEmitter {
     }
 
     get themeSyncing() {
-        return this.combinedData?.themeSyncing ?? true;
+        // Fixed black/orange branding: never take colors from the server theme
+        return false;
     }
 
     get useNativeTitleBar() {

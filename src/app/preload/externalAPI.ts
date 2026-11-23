@@ -45,6 +45,7 @@ import {
     UPDATE_THEME,
     DARK_MODE_CHANGE,
     GET_DARK_MODE,
+    GET_APP_USAGE,
     CAN_POPOUT,
     OPEN_POPOUT,
     CAN_USE_POPOUT_OPTION,
@@ -102,6 +103,7 @@ const desktopAPI: DesktopAPI = {
 
     updateTheme: (theme) => ipcRenderer.send(UPDATE_THEME, theme),
     getDarkMode: () => ipcRenderer.invoke(GET_DARK_MODE),
+    getAppUsage: () => ipcRenderer.invoke(GET_APP_USAGE),
     onDarkModeChanged: (listener) => createListener(DARK_MODE_CHANGE, listener),
 
     // Calls

@@ -278,23 +278,7 @@ describe('app/menus/appMenu/help', () => {
             expect(shell.openExternal).toHaveBeenCalledWith('http://server-report.com');
         });
 
-        it('should use default report problem link for enterprise license', () => {
-            ServerManager.getRemoteInfo.mockReturnValue({
-                licenseSku: 'enterprise',
-            });
-            localizeMessage.mockImplementation((id) => {
-                if (id === 'main.menus.app.help.reportProblem') {
-                    return 'Report a problem';
-                }
-                return id;
-            });
-            const menu = createHelpMenu();
-            const reportProblemItem = menu.submenu.find((item) => item.label === 'Report a problem');
-            reportProblemItem.click();
-            expect(shell.openExternal).toHaveBeenCalledWith('https://support.mattermost.com/hc/en-us/requests/new');
-        });
-
-        it('should use default report problem link for team edition', () => {
+        it('should not show report problem link when the server has none', () => {
             ServerManager.getRemoteInfo.mockReturnValue({
                 licenseSku: 'team',
             });
@@ -306,8 +290,7 @@ describe('app/menus/appMenu/help', () => {
             });
             const menu = createHelpMenu();
             const reportProblemItem = menu.submenu.find((item) => item.label === 'Report a problem');
-            reportProblemItem.click();
-            expect(shell.openExternal).toHaveBeenCalledWith('https://mattermost.com/pl/report-a-bug');
+            expect(reportProblemItem).toBe(undefined);
         });
 
         describe('should only show report problem link if the link is a valid http or https URL', () => {
